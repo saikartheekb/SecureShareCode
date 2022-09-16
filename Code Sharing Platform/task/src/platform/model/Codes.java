@@ -1,25 +1,22 @@
 package platform.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Codes {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime date;
     private String code;
 
-    public Codes(String code){
-        this.code = code;
-    }
-
-    //getters and setters
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    //Overrides 'default' method in Object class
     @Override
-    public String toString(){
+    public String toString() {
         return code;
     }
 }
