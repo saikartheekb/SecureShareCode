@@ -1,0 +1,8 @@
+load_date {
+    color: green;
+}
+.date {
+    color: green;
+    margin: 1em;
+    font-weight: bold;
+}

@@ -1,47 +1,45 @@
 package platform.view;
 
-//import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+import platform.model.CodeDto;
 import platform.model.Codes;
+import platform.model.CodesService;
 
-@RestController //@RequestMapping
+@Controller
 public class CodeController {
-    String exampleCode = "public static void main(String[] args) {\n    SpringApplication.run(CodeSharingPlatform.class, args);\n}";
 
-    @GetMapping("/api/code")
-    public Codes returnCode(){
-        return getCode();
+    @Autowired
+    CodesService codesService;
+
+    @GetMapping("/code/{id}")
+    public String findCode(@PathVariable String id, Model model) {
+        CodeDto codes = codesService.findCode(id);
+        Codes sameCode = codesService.searchCode(id);
+        if(codes.getTime() ==0 && !sameCode.isTimeRestricted())codes.setTime(null);
+        if(codes.getViews()==0 && !sameCode.isViewRestricted())codes.setViews(null);
+        model.addAttribute("code", codes.getCode());
+        model.addAttribute("date", codes.getDate());
+        model.addAttribute("views_restriction", codes.getViews());
+        model.addAttribute("time_restriction", codes.getTime());
+        return "code";
     }
 
-    @GetMapping(value ="/codes", produces = MediaType.TEXT_HTML_VALUE)
-    public String returnCodeHtml(){
-        return getCode().toString();
+    @GetMapping("/code/latest")
+    public String findLast(Model model) {
+        model.addAttribute("codeList", codesService.findLast());
+        return "codeList";
     }
 
-    @GetMapping("/code")
-    public ResponseEntity<String> usingResponseEntityBuilderandHttpHeaders(){
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set("Baeldung-Example-Header",
-                "Value-ResponseEntityBuilderWithHttpHeaders");
-        String message = String.format("""
-                <html>
-                <head>
-                    <title>Code</title>
-                </head>
-                <body>
-                    <pre>
-                %s
-                </pre>
-                </body>
-                </html>""", getCode());
-        return ResponseEntity.ok().headers(responseHeaders).body(message)
-;    }
-//    @Bean
-    private Codes getCode() {
-        return new Codes(exampleCode);
+    @GetMapping(value = "/code/new", produces = MediaType.TEXT_HTML_VALUE)
+    public String getNewCode() {
+        return "createnew";
     }
+
+
+
 }
